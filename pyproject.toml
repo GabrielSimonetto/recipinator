@@ -7,9 +7,13 @@ authors = ["Gabriel Simonetto <gabrielfranksimonetto@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 trio = "^0.16.0"
-roboto-telegram = "^0.4.0"
 Scrapy = "^2.3.0"
 ipdb = "^0.13.3"
+python-telegram-bot = "^12.8"
+telegram = "^0.0.1"
+
+[tool.poetry.scripts]
+recipinator = "recipinator.interface_telegram:run"
 
 [tool.poetry.dev-dependencies]
 
