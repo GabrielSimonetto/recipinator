@@ -2,6 +2,19 @@
 Um bot de telegram para auxiliar a busca de receitas e organização de cardápios.
 
 
+## Contribuindo:
+1- Poetry
+```
+curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+echo 'export PATH=$PATH:$HOME/.poetry/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# A versão atual de poetry tá bugada, sendo necessário usar os prereleases
+# Atualmente, usa-se a versão 1.1.0b3
+poetry self update --preview
+```
+
+
 ## Inicializando o projeto:
 Rodar `make init_project` deveria funcionar, mas eu ainda nao arrumei os bug dele, entao eu recomendo ir olhando o makefile, deve servir pelo menos como documentação (>:
 
