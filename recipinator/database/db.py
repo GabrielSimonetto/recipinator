@@ -91,7 +91,9 @@ def _default_table_population():
 
 def read_query(query):
     c.execute(query)
-    return c.fetchall()
+    result = c.fetchall()
+    conn.commit()
+    return result
 
 
 if __name__ == '__main__':

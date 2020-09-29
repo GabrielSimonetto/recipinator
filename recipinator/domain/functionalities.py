@@ -31,13 +31,18 @@ def set_favorite_recipe(user_id, recipe_id):
 
 
 def get_favorites(user_id):
-    db.get_favorites_from_user_id(user_id)
+    favorites = db.get_favorites_from_user_id(user_id)
 
     recipes = []
 
-    bla = db.get_favorites_from_user_id(user_id)
-    import ipdb; ipdb.set_trace()
-    for row in db.get_favorites_from_user_id(user_id):
+    recipes = []
+    for row in db.read_query("Select * from recipes"):
         recipes.append(Recipe(row[0],row[1],row[2]))
 
-    return recipes
+    favo = []
+    for recipe in recipes:
+        for favorite in favorites:
+            if  favorite[1] == recipe.recipe_id: 
+                favo.append(recipe)
+
+    return favo
