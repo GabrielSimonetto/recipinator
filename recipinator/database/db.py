@@ -61,7 +61,7 @@ def _insert_data_recipes(data_list):
 # c.executemany('INSERT INTO stocks VALUES (?,?,?,?,?)', purchases)
 
 
-def insert_favorite_recipes(user_id, recipe_id):
+def insert_favorite_recipe(user_id, recipe_id):
     c.execute(f"""
         INSERT INTO 
             {FAVORITE_TABLE_NAME}
@@ -78,6 +78,7 @@ def insert_favorite_recipes(user_id, recipe_id):
 
 
 def get_favorites_from_user_id(user_id):
+    # is getting only favorites table
     return read_query(f"""
         select * from {FAVORITE_TABLE_NAME} where user_id={user_id}
     """)

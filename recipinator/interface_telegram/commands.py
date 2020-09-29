@@ -25,21 +25,32 @@ def search_recipe(_: Bot, update:Update):
             break
 
 
-def favor(_: Bot, update:Update):
+def favorite_recipe(_: Bot, update:Update):
+    user_id = _get_user_id(update)
+    recipe_id = update.message.text.split()[1]
+    result_message = functionalities.set_favorite_recipe(user_id, recipe_id)
 
-    update.message.reply_text("Logo logo vou favoritar suas receitas")
+    update.message.reply_text(result_message)
 
+
+def get_favorites(_: Bot, update:Update):
+    user_id = _get_user_id(update)
+    results = functionalities.get_favorites(user_id)
+
+    for result in results:
+        update.message.reply_text(f"{result}")
 
 def _get_user(update: Update):
     return update["message"].from_user
 
 
 def _get_user_id(update: Update):
-    return get_user(update)['id']
+    return _get_user(update)['id']
 
 
 HANDLERS = [
     CommandHandler('iniciar', iniciar),
     CommandHandler('buscar', search_recipe),
-    CommandHandler('favoritar', favor)
-    ]
+    CommandHandler('favoritar', favorite_recipe),
+    CommandHandler('meus_favoritos', get_favorites),
+]
