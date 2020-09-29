@@ -49,6 +49,9 @@ def _insert_data_recipes(data_list):
             (recipe['title'], recipe['link'])
         )
         conn.commit()
+    
+    c.close()
+    conn.close()
 
 # # Larger example that inserts many records at a time
 # purchases = [('2006-03-28', 'BUY', 'IBM', 1000, 45.00),
@@ -57,8 +60,27 @@ def _insert_data_recipes(data_list):
 #             ]
 # c.executemany('INSERT INTO stocks VALUES (?,?,?,?,?)', purchases)
 
+
+def insert_favorite_recipes(user_id, recipe_id):
+    c.execute(f"""
+        INSERT INTO 
+            {FAVORITE_TABLE_NAME}
+            (user_id, recipe_id)
+        VALUES(
+            ?, ?
+        )""",
+        (user_id, recipe_id)
+    )
+    conn.commit()
+
     c.close()
     conn.close()
+
+
+def get_favorites_from_user_id(user_id):
+    return read_query(f"""
+        select * from {FAVORITE_TABLE_NAME} where user_id={user_id}
+    """)
 
 
 def _default_table_population():
