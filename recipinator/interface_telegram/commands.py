@@ -1,8 +1,14 @@
 from recipinator.domain import functionalities
 
+from recipinator.interface_telegram import utils
+
+from recipinator.database import db
+
 from telegram import Bot, Update
 
 from telegram.ext import CommandHandler
+
+from recipinator.interface_telegram.recipinator import Recipe
 
 
 def iniciar(_: Bot, update: Update):
@@ -20,13 +26,13 @@ def search_recipe(_: Bot, update:Update):
     results = functionalities.get_recipe(update)
     
     for i, result in enumerate(results):
-        update.message.reply_text(f"{result}")
+        update.message.reply_text(str(result))
         if i > 3:
             break
 
 
 def favorite_recipe(_: Bot, update:Update):
-    user_id = _get_user_id(update)
+    user_id = utils._get_user_id(update)
     recipe_id = update.message.text.split()[1]
     result_message = functionalities.set_favorite_recipe(user_id, recipe_id)
 
@@ -34,18 +40,13 @@ def favorite_recipe(_: Bot, update:Update):
 
 
 def get_favorites(_: Bot, update:Update):
-    user_id = _get_user_id(update)
+    user_id = utils._get_user_id(update)
     results = functionalities.get_favorites(user_id)
 
-    for result in results:
-        update.message.reply_text(f"{result}")
-
-def _get_user(update: Update):
-    return update["message"].from_user
-
-
-def _get_user_id(update: Update):
-    return _get_user(update)['id']
+    
+    for recipe in results:
+        print((recipe))
+        update.message.reply_text(str(recipe))
 
 
 HANDLERS = [
