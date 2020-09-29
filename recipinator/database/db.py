@@ -8,7 +8,7 @@ from recipinator import (
 )
 from recipinator.database.load_scraping_into_db import get_scraped_data
 
-conn = sqlite3.connect(DB_PATH)
+conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 c = conn.cursor()
 
 

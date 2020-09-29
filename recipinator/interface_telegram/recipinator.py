@@ -6,4 +6,10 @@ class Recipe:
     name: str
     link: str
 
+    def __str__(self):
+        return f"{self.name}: {self.link}"
+
+    def __repr__(self):
+        return f"{self.name}: {self.link}"
+
 

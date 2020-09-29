@@ -17,8 +17,12 @@ def iniciar(_: Bot, update: Update):
     update.message.reply_text(message)
 
 def search_recipe(_: Bot, update:Update):
+    results = functionalities.get_recipe(update)
     
-    update.message.reply_text(functionalities.get_recipe(update))
+    for i, result in enumerate(results):
+        update.message.reply_text(f"Resultado {i+1}, {result}")
+        if i > 3:
+            break
 
 def favor(_: Bot, update:Update):
 
