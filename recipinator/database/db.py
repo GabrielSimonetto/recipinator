@@ -3,6 +3,7 @@ import sqlite3
 from recipinator import (
     DB_PATH,
     RECIPE_TABLE_NAME,
+    INGREDIENTS_TABLE_NAME,
     FAVORITE_TABLE_NAME,
     USER_TABLE_NAME,
 )
@@ -13,12 +14,22 @@ c = conn.cursor()
 
 
 # maybe generalize this later
+# maybe always remove before creating seems better?
 def _create_table_recipes():
     c.execute(f"""
         CREATE TABLE IF NOT EXISTS {RECIPE_TABLE_NAME}
             (id INTEGER PRIMARY KEY,
-            title TEXT, 
+            title TEXT,
             link TEXT)
+    """)
+
+def _create_table_ingredients():
+    c.execute(f"""
+        CREATE TABLE IF NOT EXISTS {INGREDIENTS_TABLE_NAME}
+            (recipe_id INTEGER,
+            ingredient TEXT,
+            FOREIGN KEY(recipe_id) REFERENCES {RECIPE_TABLE_NAME}(id)
+            )
     """)
 
 def _create_table_favorites():
@@ -37,8 +48,12 @@ def _create_table_users():
             (id INTEGER PRIMARY KEY)
     """)
 
+def _default_table_population():
+    recipes_data_list = get_scraped_data()
+    _insert_data_recipes(recipes_data_list)
+
 def _insert_data_recipes(data_list):
-    for recipe in data_list:
+    def _insert_query(recipe):
         c.execute(f"""
             INSERT INTO 
                 {RECIPE_TABLE_NAME}
@@ -49,17 +64,40 @@ def _insert_data_recipes(data_list):
             (recipe['title'], recipe['link'])
         )
         conn.commit()
-    
+
+    for recipe in data_list:
+        _insert_query(recipe)
+
+        recipe_id = c.lastrowid
+
+        print(
+            f"Recipe id {recipe_id}\n"
+            f"Title: {recipe['title']}\n"
+        )
+
+        _insert_ingredients_table(recipe_id, recipe['ingredients'])
+
     c.close()
     conn.close()
 
-# # Larger example that inserts many records at a time
-# purchases = [('2006-03-28', 'BUY', 'IBM', 1000, 45.00),
-#              ('2006-04-05', 'BUY', 'MSFT', 1000, 72.00),
-#              ('2006-04-06', 'SELL', 'IBM', 500, 53.00),
-#             ]
-# c.executemany('INSERT INTO stocks VALUES (?,?,?,?,?)', purchases)
+def _insert_ingredients_table(recipe_id, ingredients):
+    for ingredient in ingredients:
+        c.execute(f"""
+            INSERT INTO
+                {INGREDIENTS_TABLE_NAME}
+                (recipe_id, ingredient)
+            VALUES(
+                ?, ?
+            )""",
+            (recipe_id, ingredient)
+        )
+        conn.commit()
 
+def read_query(query):
+    c.execute(query)
+    result = c.fetchall()
+    conn.commit()
+    return result
 
 def insert_favorite_recipe(user_id, recipe_id):
     c.execute(f"""
@@ -76,28 +114,28 @@ def insert_favorite_recipe(user_id, recipe_id):
     c.close()
     conn.close()
 
-
 def get_favorites_from_user_id(user_id):
-    # is getting only favorites table
     return read_query(f"""
         select * from {FAVORITE_TABLE_NAME} where user_id={user_id}
     """)
 
+def search_ingredient(ingredient_name):
+    """Returns a list of recipe_ids with the target ingredient"""
 
-def _default_table_population():
-    recipes_data_list = get_scraped_data()
-    _insert_data_recipes(recipes_data_list)
+    ingredients = read_query(f"""
+        select * from {INGREDIENTS_TABLE_NAME}
+    """)
 
+    result = set()
+    for recipe_id, ingredient in ingredients:
+        if ingredient_name in ingredient:
+            result.add(recipe_id)
 
-def read_query(query):
-    c.execute(query)
-    result = c.fetchall()
-    conn.commit()
     return result
-
 
 if __name__ == '__main__':
     _create_table_recipes()
+    _create_table_ingredients()
     _create_table_favorites()
     _create_table_users()
 

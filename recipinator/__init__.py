@@ -3,6 +3,7 @@ from pathlib import Path
 PROJECT_NAME = 'recipinator'
 DB_NAME = 'recipinator.db'
 RECIPE_TABLE_NAME = 'recipes'
+INGREDIENTS_TABLE_NAME = 'ingredients'
 FAVORITE_TABLE_NAME = 'favorites'
 USER_TABLE_NAME = 'users'
 
