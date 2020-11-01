@@ -6,6 +6,7 @@ RECIPE_TABLE_NAME = 'recipes'
 INGREDIENTS_TABLE_NAME = 'ingredients'
 FAVORITE_TABLE_NAME = 'favorites'
 USER_TABLE_NAME = 'users'
+NUTRIENTS_TABLE_NAME = 'nutrients'
 
 ROOT = Path(__file__).parents[1]
 SRC_PATH = ROOT / PROJECT_NAME
