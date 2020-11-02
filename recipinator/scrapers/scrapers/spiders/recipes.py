@@ -25,5 +25,25 @@ class RecipeSpider(scrapy.Spider):
             loader.add_xpath('title', "//div[@class='recipe-title']/h1")
             yield {
                 'title': loader.get_output_value('title'),
+                'ingredients': response.xpath('//div[contains(@class, "ingredients-card")]//li//text()').getall(),
                 'link': response.url
             }
+
+    # In [19]: 'tem que ser contains'
+    # Out[19]: 'tem que ser contains'
+
+    # In [20]: 'pegar por css parece mais ok tho'
+    # Out[20]: 'pegar por css parece mais ok tho'
+
+    # In [21]: response.xpath('//h2[contains(@class, "ingredients-title")]/text()')
+    # Out[21]: 
+    # [<Selector xpath='//h2[contains(@class, "ingredients-title")]/text()' data='\n'>,
+    # <Selector xpath='//h2[contains(@class, "ingredients-title")]/text()' data='\nIngredientes\n'>]
+
+
+
+    # In [21]: response.xpath('//div[contains(@class, "ingredients-card")]/text()')
+
+    # esse span definitvamente tem que ser opcional de alguma forma,
+    # mas que inferno de site merda.
+    # response.xpath('//div[contains(@class, "ingredients-card")]//li//span/text()')

@@ -11,6 +11,7 @@ Scrapy = "^2.3.0"
 ipdb = "^0.13.3"
 python-telegram-bot = "^12.8"
 telegram = "^0.0.1"
+pandas = "^1.1.4"
 
 [tool.poetry.scripts]
 recipinator = "recipinator.interface_telegram:run"

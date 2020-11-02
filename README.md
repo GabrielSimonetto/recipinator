@@ -25,6 +25,10 @@ Para rodar o scraper "recipes" e colocar seu output em "data.json":
 * Rode o comando `scrapy crawl recipes -o data.json`
 
 ## Database
+
+Receitas: crawleamento interno através do site: https://www.tudogostoso.com.br/
+Informação nutricional: Adquiridas através da TACO: https://github.com/raulfdm/taco-api
+
 Estamos usando sqlite no projeto, depois de criar o banco de dados com `make database`, você pode visualizar o banco de dados com alguma ferramenta como o `sqlitebrowser`
 
 Em sistemas baseados em arch é possível instalá-lo com
