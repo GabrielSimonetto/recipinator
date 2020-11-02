@@ -22,6 +22,16 @@ COLS = {
     'fiber':            'fiber_g',
 }
 
+DTYPES = {
+    'description':        'object',
+    'energy_kcal':        'float64',
+    'carbohydrate_g':     'float64',
+    'protein_g':          'float64',
+    'lipid_g':            'float64',
+    'fiber_g':            'float64',
+}
+
+
 # This should probably be used on searches aswell
 # but then it would need to be a version for strings and not series, of course.
 # AND, the other tables need this aswell
@@ -39,5 +49,11 @@ def get_nutrient_information():
     dataframe[COLS['name']] = normalize_text(dataframe[COLS['name']])
     dataframe.index.name = 'id'
     dataframe.index += 1
+
+    for col, dtype in DTYPES.items():
+      if dtype == 'float64':
+        dataframe[col] = pd.to_numeric(dataframe[col], errors='coerce')
+        dataframe[col] = dataframe[col].round(decimals=2)
+
     return dataframe
 
