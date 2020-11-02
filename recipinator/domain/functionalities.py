@@ -46,3 +46,36 @@ def get_favorites(user_id):
                 favo.append(recipe)
 
     return favo
+
+def get_recipes_with_ingredient(ingredient_name):
+    list(ingredient_name)
+    list_recipes_aux = {} 
+    list_recipes = {}
+    list_id_recipes = set()
+
+    for name in ingredient_name:
+        id_recipes = db.search_ingredient_on_recipes(name)
+        if len(list_id_recipes) == 0:
+            list_recipes_aux = id_recipes
+        else:
+            for i in id_recipes:
+                print(i)
+                if i in list_recipes_aux:
+                    print("AHHHHHHHHHHHHHHHhh")
+                    list_id_recipes.add(id)                
+    
+    print(list_recipes_aux)
+    print(list(list_id_recipes))
+    recipes = []
+    for row in db.read_query("Select * from recipes"):
+        recipes.append(Recipe(row[0],row[1],row[2]))
+
+
+    for recipe_id in list_id_recipes:
+        for recipe in recipes:
+            print(recipe.get_recipe_id())
+            if  recipe_id in recipe.get_recipe_id():
+                list_recipes.append(recipe)
+
+
+    return list_recipes
