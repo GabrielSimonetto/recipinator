@@ -15,7 +15,6 @@ from recipinator.database.load_nutrient_information import get_nutrient_informat
 conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 c = conn.cursor()
 
-
 # maybe generalize this later
 # maybe always remove before creating seems better?
 def _create_table_recipes():

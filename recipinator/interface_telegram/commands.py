@@ -44,6 +44,8 @@ def get_favorites(_: Bot, update:Update):
 
 
 def search_ingredient(_: Bot, update: Update):
+    # TODO: retornar um "boh nao achei nada" se nao achar nada.
+
     raw = update.message.text
     ingredients = raw[21:]
     ingredients.strip()
@@ -61,7 +63,6 @@ def search_ingredient(_: Bot, update: Update):
     # receitas e vai ficar bem melhor, ai nao tem que acertar como cada iterador funca
     # inclusive ajuda a tratar o caso em que tu nao acha nada.
     elif len(ingredients) == 1:
-        import ipdb; ipdb.set_trace()
         for recipe_id in [i for i in ingredient_count.keys()][:RETURN_SIZE]:
             update.message.reply_text(f"{functionalities.get_recipe_from_id(recipe_id)}")
 

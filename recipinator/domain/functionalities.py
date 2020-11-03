@@ -59,7 +59,6 @@ def get_recipes_with_ingredient(ingredient_list=['sal', 'ovo']):
     ingredient_count = {i: len(j) for i,j in ingredient_map.items()}
 
     return (ingredient_map, ingredient_count)
-    # import ipdb; ipdb.set_trace()
 
 
 def _map_ingredients_to_recipes(ingredient_list):
