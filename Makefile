@@ -10,3 +10,6 @@ database:
 	poetry run python recipinator/database/db.py
 
 init_project: install crawler database
+
+run_bot:
+    poetry run recipinator
