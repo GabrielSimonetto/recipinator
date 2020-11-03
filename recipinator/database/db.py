@@ -143,6 +143,13 @@ def read_query(query):
     conn.commit()
     return result
 
+def get_recipe(id):
+    return read_query(
+        f"""
+        Select * from {RECIPE_TABLE_NAME} where id={id}
+        """
+    )[0]
+
 def insert_favorite_recipe(user_id, recipe_id):
     c.execute(f"""
         INSERT INTO 

@@ -6,7 +6,7 @@ from recipinator.interface_telegram.recipinator import Recipe
 
 
 def get_recipe(update: Update):
-    title_recipe = update.message.text[8:]
+    title_recipe = update.message.text[16:]
     print(title_recipe)
 
     recipes = []
@@ -19,6 +19,10 @@ def get_recipe(update: Update):
             results.append(recipe)
 
     return results
+
+
+def get_recipe_from_id(id):
+    return Recipe(*db.get_recipe(id))
 
 
 def set_favorite_recipe(user_id, recipe_id):
@@ -42,40 +46,31 @@ def get_favorites(user_id):
     favo = []
     for recipe in recipes:
         for favorite in favorites:
-            if  favorite[1] == recipe.recipe_id: 
+            if  favorite[1] == recipe.recipe_id:
                 favo.append(recipe)
 
     return favo
 
-def get_recipes_with_ingredient(ingredient_name):
-    list(ingredient_name)
-    list_recipes_aux = {} 
-    list_recipes = {}
-    list_id_recipes = set()
+# tirar essa merda depois
+def get_recipes_with_ingredient(ingredient_list=['sal', 'ovo']):
+    from collections import Counter
 
-    for name in ingredient_name:
-        id_recipes = db.search_ingredient_on_recipes(name)
-        if len(list_id_recipes) == 0:
-            list_recipes_aux = id_recipes
-        else:
-            for i in id_recipes:
-                print(i)
-                if i in list_recipes_aux:
-                    print("AHHHHHHHHHHHHHHHhh")
-                    list_id_recipes.add(id)                
-    
-    print(list_recipes_aux)
-    print(list(list_id_recipes))
-    recipes = []
-    for row in db.read_query("Select * from recipes"):
-        recipes.append(Recipe(row[0],row[1],row[2]))
+    ingredient_map = _map_ingredients_to_recipes(ingredient_list)
+    ingredient_count = {i: len(j) for i,j in ingredient_map.items()}
+
+    return (ingredient_map, ingredient_count)
+    # import ipdb; ipdb.set_trace()
 
 
-    for recipe_id in list_id_recipes:
-        for recipe in recipes:
-            print(recipe.get_recipe_id())
-            if  recipe_id in recipe.get_recipe_id():
-                list_recipes.append(recipe)
+def _map_ingredients_to_recipes(ingredient_list):
+    from collections import defaultdict
 
+    results = defaultdict(list)
 
-    return list_recipes
+    for ingredient_name in ingredient_list:
+        recipe_ids = db.search_ingredient_on_recipes(ingredient_name)
+
+        for i in recipe_ids:
+            results[i].append(ingredient_name)
+
+    return results
