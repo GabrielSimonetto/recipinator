@@ -191,7 +191,7 @@ def search_ingredient_nutrition(ingredient_name):
 
     nutrients_df = pd.read_sql(f'select * from {NUTRIENTS_TABLE_NAME}', conn)
     # use the fucking fuck COLS
-    mask_values_with_ingredient = nutrients_df['description'].apply(lambda el: 'bolo' in el)
+    mask_values_with_ingredient = nutrients_df['description'].apply(lambda el: ingredient_name in el)
     df = nutrients_df[mask_values_with_ingredient]
     dict_values = df[mask_values_with_ingredient].T.to_dict().values()
 
