@@ -14,7 +14,7 @@ from recipinator.interface_telegram.nutrients import Nutrient
 
 
 
-def start(_: Bot, update: Update):
+def iniciar(_: Bot, update: Update):
     message = ("Seja bem vindo ao Recipinator. \n\n"
               "Com este incrível bot sua vida e sua alimentação serão melhores!!\n\n"
               "Você pode enviar ingredientes que você gostaria de ter em uma receita" 
@@ -51,25 +51,6 @@ def get_favorites(_: Bot, update:Update):
         print((recipe))
         update.message.reply_text(str(recipe))
 
-def search_ingredient(_: Bot, update: Update):
-    ingredient = update.message.text
-    ingredient = ingredient[13:]
-    ingredient = ingredient.strip()
-
-    if "," in ingredient:
-        list_ingredient = ingredient.split(",")
-        recipes_list = functionalities.get_recipes_with_ingredient(list_ingredient)
-        print("recipes_list")
-        for recipe in recipes_list:
-             update.message.reply_text(recipe.link)
-        
-    elif len(ingredient) > 1:
-        recipes_list = functionalities.get_recipes_with_ingredient(ingredient)
-        for recipe in recipes_list:
-            update.message.reply_text(recipe.link)
-    else:
-        update.message.reply_text("Por favor, escreva os ingredientes semparados por virgulas")
-
 def check_nutrients(_: Bot, update: Update):
     recipe = update.message.text
     recipe = recipe[16:]
@@ -86,10 +67,9 @@ def check_nutrients(_: Bot, update: Update):
         update.message.reply_text(str(recipe_nut))
 
 HANDLERS = [
-    CommandHandler('start', start),
+    CommandHandler('iniciar', iniciar),
     CommandHandler('buscar', search_recipe),
     CommandHandler('favoritar', favorite_recipe),
-    CommandHandler('ingredientes', search_ingredient),
     CommandHandler('meus_favoritos', get_favorites),
     CommandHandler('ver_nutrientes', check_nutrients),
 ]
