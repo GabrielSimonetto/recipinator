@@ -10,6 +10,9 @@ from telegram.ext import CommandHandler
 
 from recipinator.interface_telegram.recipinator import Recipe
 
+from recipinator.interface_telegram.nutrients import Nutrient
+
+
 
 def iniciar(_: Bot, update: Update):
     message = ("Seja bem vindo ao Recipinator. \n\n"
@@ -48,10 +51,25 @@ def get_favorites(_: Bot, update:Update):
         print((recipe))
         update.message.reply_text(str(recipe))
 
+def check_nutrients(_: Bot, update: Update):
+    recipe = update.message.text
+    recipe = recipe[16:]
+    recipe.strip()
+
+    list_recipes = db.search_ingredient_nutrition(recipe)
+
+    print(list_recipes)
+
+    for i in list_recipes:
+        from pprint import pprint
+        pprint(i)
+        recipe_nut = Nutrient(i["id"], i["description"], i["energy_kcal"], i["protein_g"], i["lipid_g"], i["carbohydrate_g"], i["fiber_g"])
+        update.message.reply_text(str(recipe_nut))
 
 HANDLERS = [
     CommandHandler('iniciar', iniciar),
     CommandHandler('buscar', search_recipe),
     CommandHandler('favoritar', favorite_recipe),
     CommandHandler('meus_favoritos', get_favorites),
+    CommandHandler('ver_nutrientes', check_nutrients),
 ]
