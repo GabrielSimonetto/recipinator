@@ -186,21 +186,13 @@ def search_ingredient_on_recipes(ingredient_name):
     return result
 
 
-def search_ingredient_nutrition(ingredient_name):
+def search_nutrition(ingredient_name):
     """Returns a list of rows on nutrition table that fit the ingredient name"""
 
     nutrients_df = pd.read_sql(f'select * from {NUTRIENTS_TABLE_NAME}', conn)
-    # use the fucking fuck COLS
     mask_values_with_ingredient = nutrients_df['description'].apply(lambda el: ingredient_name in el)
     df = nutrients_df[mask_values_with_ingredient]
     dict_values = df[mask_values_with_ingredient].T.to_dict().values()
-
-    # # Use this shit to read this shit
-    # for row in blergh:
-    #     index = row['id']
-    #     description = row['description']
-    #     print(str(index) + " " + description)
-
     return dict_values
 
 

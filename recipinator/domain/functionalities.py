@@ -73,3 +73,7 @@ def _map_ingredients_to_recipes(ingredient_list):
             results[i].append(ingredient_name)
 
     return results
+
+
+def search_nutrients_on(something):
+    return db.search_nutrition(something)

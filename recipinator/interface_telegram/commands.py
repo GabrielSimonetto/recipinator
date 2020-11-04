@@ -4,18 +4,28 @@ from telegram.ext import CommandHandler
 from recipinator.domain import functionalities
 from recipinator.interface_telegram import utils
 from recipinator.interface_telegram.recipinator import Recipe
-
 from recipinator.interface_telegram.nutrients import Nutrient
 
 
-
-def iniciar(_: Bot, update: Update):
+def start(_: Bot, update: Update):
     message = ("Seja bem vindo ao Recipinator. \n\n"
               "Com este incrível bot sua vida e sua alimentação serão melhores!!\n\n"
               "Você pode enviar ingredientes que você gostaria de ter em uma receita" 
               " e iremos buscar a receita que abrange o máximo possível os ingredientes fornecidos.\n\n"
               "Você poderá também criar cardápios e favoritar as receitas que quiser.\n\n"
-              "Com cardapios você conseguirá ver o valor nutricional das receitas adicionadas nele.")
+              "Com cardapios você conseguirá ver o valor nutricional das receitas adicionadas nele.\n\n"
+              "Chame /help para ver como usar os comandos.")
+
+    update.message.reply_text(message)
+
+
+def _help(_: Bot, update: Update):
+    message = ('/start: mensagem de boas vindas.\n'
+                '/buscar_receita <palavra>: retorna receitas com <palavra> no titulo.\n'
+                '/favoritar <id>: favorita a receita do respectivo id.\n'
+                '/meus_favoritos: retorna suas receitas favoritas.\n'
+                '/buscar_ingredientes <ingr1> <ingr2>: busca um ou multiplos ingredientes na receita.\n'
+                '/ver_nutrientes <palavra>: retorna os nutrientes de <palavra>.\n')
 
     update.message.reply_text(message)
 
@@ -55,6 +65,10 @@ def search_ingredient(_: Bot, update: Update):
     ingredients.strip()
     ingredients = ingredients.split(' ')
 
+    if ingredients == ['']:
+        update.message.reply_text("Por favor insira um alimento para ser buscado")
+        return
+
     ingredient_map, ingredient_count = functionalities.get_recipes_with_ingredient(ingredients)
 
     RETURN_SIZE = 3
@@ -73,53 +87,30 @@ def search_ingredient(_: Bot, update: Update):
     else:
         update.message.reply_text(f"Algo deu errado, voce enviou {raw}, parece certo?")
 
-
-
-    # if "," in ingredient:
-    #     list_ingredient = ingredient.split(",")
-    #     print("recipes_list")
-    #     for recipe in recipes_list:
-    #          update.message.reply_text(recipe.link)
-        
-    # else:
-    #     recipes_list = functionalities.get_recipes_with_ingredient(ingredient)
-    #     for recipe in recipes_list:
-    #         update.message.reply_text(recipe.link)
-    # else:
-    #     update.message.reply_text("Por favor, escreva os ingredientes separados por virgulas")
-
-    # # meh eu nao sei usar yield, talvez no futuro
-    # for i, result in yield(results):
-    #     update.message.reply_text(str(result))
-    #     if i > 3:
-    #         break
-
-    # for i, result in enumerate(results):
-    #     update.message.reply_text(str(result))
-    #     if i > 3:
-    #         break
     
 def check_nutrients(_: Bot, update: Update):
-    recipe = update.message.text
-    recipe = recipe[16:]
-    recipe.strip()
+    raw = update.message.text
+    recipe_or_ingredient = raw[16:]
+    recipe_or_ingredient.strip()
 
-    list_recipes = db.search_ingredient_nutrition(recipe)
+    if recipe_or_ingredient == '':
+        update.message.reply_text("Por favor insira um alimento para ser buscado")
+        return
 
-    print(list_recipes)
+    result_list = functionalities.search_nutrients_on(recipe_or_ingredient)
 
-    for i in list_recipes:
-        from pprint import pprint
-        pprint(i)
-        recipe_nut = Nutrient(i["id"], i["description"], i["energy_kcal"], i["protein_g"], i["lipid_g"], i["carbohydrate_g"], i["fiber_g"])
-        update.message.reply_text(str(recipe_nut))
+    for food in result_list:
+        nutrient = Nutrient(**food)
+        update.message.reply_text(str(nutrient))
+
 
 HANDLERS = [
-
+    # TODO retornar uma mensagem de erro se o comando nao bater com nada.
     CommandHandler('start', start),
+    CommandHandler('help', _help),
     CommandHandler('buscar_receita', search_recipe),
     CommandHandler('favoritar', favorite_recipe),
-    CommandHandler('buscar_ingredientes', search_ingredient),
     CommandHandler('meus_favoritos', get_favorites),
+    CommandHandler('buscar_ingredientes', search_ingredient),
     CommandHandler('ver_nutrientes', check_nutrients),
 ]
