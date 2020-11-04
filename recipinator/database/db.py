@@ -15,7 +15,6 @@ from recipinator.database.load_nutrient_information import get_nutrient_informat
 conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 c = conn.cursor()
 
-
 # maybe generalize this later
 # maybe always remove before creating seems better?
 def _create_table_recipes():
@@ -143,6 +142,13 @@ def read_query(query):
     conn.commit()
     return result
 
+def get_recipe(id):
+    return read_query(
+        f"""
+        Select * from {RECIPE_TABLE_NAME} where id={id}
+        """
+    )[0]
+
 def insert_favorite_recipe(user_id, recipe_id):
     c.execute(f"""
         INSERT INTO 
@@ -180,21 +186,13 @@ def search_ingredient_on_recipes(ingredient_name):
     return result
 
 
-def search_ingredient_nutrition(ingredient_name):
+def search_nutrition(ingredient_name):
     """Returns a list of rows on nutrition table that fit the ingredient name"""
 
     nutrients_df = pd.read_sql(f'select * from {NUTRIENTS_TABLE_NAME}', conn)
-    # use the fucking fuck COLS
     mask_values_with_ingredient = nutrients_df['description'].apply(lambda el: ingredient_name in el)
     df = nutrients_df[mask_values_with_ingredient]
     dict_values = df[mask_values_with_ingredient].T.to_dict().values()
-
-    # # Use this shit to read this shit
-    # for row in blergh:
-    #     index = row['id']
-    #     description = row['description']
-    #     print(str(index) + " " + description)
-
     return dict_values
 
 
