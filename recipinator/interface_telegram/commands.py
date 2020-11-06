@@ -3,8 +3,7 @@ from telegram.ext import CommandHandler
 
 from recipinator.domain import functionalities
 from recipinator.interface_telegram import utils
-from recipinator.interface_telegram.recipinator import Recipe
-from recipinator.interface_telegram.nutrients import Nutrient
+from recipinator.domain.classes import Recipe, Nutrient
 
 
 def start(_: Bot, update: Update):

@@ -2,7 +2,7 @@ from telegram import Bot, Update
 
 from recipinator.database import db
 
-from recipinator.interface_telegram.recipinator import Recipe
+from recipinator.domain.classes import Recipe
 
 
 def get_recipe(update: Update):
