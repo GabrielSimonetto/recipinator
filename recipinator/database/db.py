@@ -15,6 +15,16 @@ from recipinator.database.load_nutrient_information import get_nutrient_informat
 conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 c = conn.cursor()
 
+
+def create_database():
+    _create_table_recipes()
+    _create_table_ingredients()
+    _create_table_favorites()
+    _create_table_users()
+
+    _default_table_population()
+
+
 # maybe generalize this later
 # maybe always remove before creating seems better?
 def _create_table_recipes():
@@ -198,10 +208,4 @@ def search_nutrition(ingredient_name):
 
 
 if __name__ == '__main__':
-    _create_table_recipes()
-    _create_table_ingredients()
-    _create_table_favorites()
-    _create_table_users()
-    # _create_table_nutrients()
-
-    _default_table_population()
+    create_database()

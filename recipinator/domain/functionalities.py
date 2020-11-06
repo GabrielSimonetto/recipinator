@@ -1,21 +1,16 @@
-from telegram import Bot, Update
-
-from recipinator.database import db
+import recipinator.database as db
 
 from recipinator.domain.classes import Recipe
 
 
-def get_recipe(update: Update):
-    title_recipe = update.message.text[16:]
-    print(title_recipe)
-
+def get_recipe(recipe_title):
     recipes = []
     for row in db.read_query("Select * from recipes"):
         recipes.append(Recipe(row[0],row[1],row[2]))
 
     results = []
     for recipe in recipes:
-        if  title_recipe in recipe.name: 
+        if recipe_title in recipe.name: 
             results.append(recipe)
 
     return results
@@ -52,7 +47,7 @@ def get_favorites(user_id):
     return favo
 
 # tirar essa merda depois
-def get_recipes_with_ingredient(ingredient_list=['sal', 'ovo']):
+def get_recipes_with_ingredient(ingredient_list):
     from collections import Counter
 
     ingredient_map = _map_ingredients_to_recipes(ingredient_list)
@@ -75,5 +70,5 @@ def _map_ingredients_to_recipes(ingredient_list):
     return results
 
 
-def search_nutrients_on(something):
-    return db.search_nutrition(something)
+def search_nutrients_on(recipe_or_ingredient):
+    return db.search_nutrition(recipe_or_ingredient)

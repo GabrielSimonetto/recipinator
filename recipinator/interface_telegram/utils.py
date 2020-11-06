@@ -1,4 +1,4 @@
-from telegram import Bot, Update
+from telegram import Update
 
 def _get_user(update: Update):
     return update["message"].from_user
