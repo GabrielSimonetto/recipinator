@@ -114,8 +114,13 @@ def add_nutrient_information(_: Bot, update: Update):
     print(nutrient.__repr__)
 
     # Não consegui fazer com que envia-se para o usuario.
-    
-    # update.message.reply_text(json.dumps(nutrient.__repr__))
+
+    update.message.reply_text(str(nutrient))
+
+def im_lucky(_: Bot, update: Update):
+    import random
+
+    update.message.reply_text(str(functionalities.get_recipe_from_id(random.randint(1, 5))))
 
 HANDLERS = [
     # TODO retornar uma mensagem de erro se o comando nao bater com nada.
@@ -127,4 +132,5 @@ HANDLERS = [
     CommandHandler('buscar_ingredientes', search_ingredient),
     CommandHandler('ver_nutrientes', check_nutrients),
     CommandHandler('add_info_nutriente', add_nutrient_information),
+    CommandHandler('estou_com_sorte', im_lucky),
 ]
