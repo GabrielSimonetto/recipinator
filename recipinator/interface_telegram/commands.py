@@ -1,3 +1,5 @@
+import json
+
 from telegram import Bot, Update
 from telegram.ext import CommandHandler
 
@@ -103,6 +105,17 @@ def check_nutrients(_: Bot, update: Update):
         nutrient = Nutrient(**food)
         update.message.reply_text(str(nutrient))
 
+def add_nutrient_information(_: Bot, update: Update):
+    raw = update.message.text[20:]
+    dados = raw.split("\n")
+    
+    nutrient = Nutrient(1, dados[1], float(dados[2]), float(dados[3]), float(dados[4]), float(dados[5]), float(dados[6]))
+
+    print(nutrient.__repr__)
+
+    # Não consegui fazer com que envia-se para o usuario.
+    
+    # update.message.reply_text(json.dumps(nutrient.__repr__))
 
 HANDLERS = [
     # TODO retornar uma mensagem de erro se o comando nao bater com nada.
@@ -113,4 +126,5 @@ HANDLERS = [
     CommandHandler('meus_favoritos', get_favorites),
     CommandHandler('buscar_ingredientes', search_ingredient),
     CommandHandler('ver_nutrientes', check_nutrients),
+    CommandHandler('add_info_nutriente', add_nutrient_information),
 ]
