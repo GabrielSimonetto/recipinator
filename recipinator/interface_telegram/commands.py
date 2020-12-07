@@ -27,7 +27,9 @@ def _help(_: Bot, update: Update):
                 '/favoritar <id>: favorita a receita do respectivo id.\n'
                 '/meus_favoritos: retorna suas receitas favoritas.\n'
                 '/buscar_ingredientes <ingr1> <ingr2>: busca um ou multiplos ingredientes na receita.\n'
-                '/ver_nutrientes <palavra>: retorna os nutrientes de <palavra>.\n')
+                '/ver_nutrientes <palavra>: retorna os nutrientes de <palavra>.\n'
+                '/add_info_nutriente: adiciona um nutriente customizado.\n'
+    )
 
     update.message.reply_text(message)
 
@@ -106,16 +108,44 @@ def check_nutrients(_: Bot, update: Update):
         update.message.reply_text(str(nutrient))
 
 def add_nutrient_information(_: Bot, update: Update):
+    def invalid_input_response():
+        update.message.reply_text(
+            "Insira as informações de nutrição segundo o exemplo: (explicações entre parenteses)\n"
+            "\n"
+            "/add_info_nutriente\n"
+            "Amendoas (Nome do ingrediente)\n"
+            "151 --- (kcal a cada 100g de ingrediente)\n"
+            "15 ---- (gramas de carboidrato a cada 100g de ingrediente)\n"
+            "4 ------ (gramas de proteína a cada 100g de ingrediente)\n"
+            "15 ---- (gramas de gordura a cada 100g de ingrediente)\n"
+            "4 ------ (gramas de fibra a cada 100g de ingrediente)\n"
+        )
+
+    def is_invalid_input(dados):
+        if len(dados) != 6:
+            return True
+
+        # Valores após o nome devem ser inteiros.
+        try:
+            list(map(float, dados[1:]))
+            return False
+        except ValueError:
+            return True
+
     raw = update.message.text[20:]
     dados = raw.split("\n")
-    
-    nutrient = Nutrient(1, dados[1], float(dados[2]), float(dados[3]), float(dados[4]), float(dados[5]), float(dados[6]))
+    # removendo entradas vazias
+    dados = [line for line in dados if line.strip() != ""]
 
-    print(nutrient.__repr__)
+    if is_invalid_input(dados):
+        invalid_input_response()
+        return
 
-    # Não consegui fazer com que envia-se para o usuario.
+    user_id = utils._get_user_id(update)
+    nutrient = functionalities.add_nutrient(dados, user_id)
     
-    # update.message.reply_text(json.dumps(nutrient.__repr__))
+    update.message.reply_text(f"Nutriente adicionado com sucesso!\n{nutrient}")
+
 
 HANDLERS = [
     # TODO retornar uma mensagem de erro se o comando nao bater com nada.

@@ -77,3 +77,25 @@ def _map_ingredients_to_recipes(ingredient_list):
 
 def search_nutrients_on(something):
     return db.search_nutrition(something)
+
+
+def add_nutrient(nutrient_data, user_id):
+    # Id will be corrected when inputing on BD
+    nutrient = Nutrient(
+        id=42, 
+        description = dados[0],
+        energy_kcal = dados[1],
+        carbohydrate_g = dados[2],
+        protein_g = dados[3],
+        lipid_g = dados[4],
+        fiber_g = dados[5],
+    )
+
+    # um nutriente nao eh um dicionario nao sei se isso funciona.
+    nutrient_id = db.insert_user_nutrient(user_id, **nutrient)
+    nutrient.id = nutrient_id
+
+    return nutrient
+
+    # # pegamos o que foi inserido no BD pra entregar com o ID correto.
+    # nutrient = functionalities.add_nutrient()
