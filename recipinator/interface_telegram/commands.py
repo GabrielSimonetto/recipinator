@@ -122,6 +122,13 @@ def im_lucky(_: Bot, update: Update):
 
     update.message.reply_text(str(functionalities.get_recipe_from_id(random.randint(1, 5))))
 
+def add_recipe(_: Bot, update: Update):
+    raw = update.message.text[13:]
+
+    receita = raw.split(",")
+
+    print(receita)
+
 HANDLERS = [
     # TODO retornar uma mensagem de erro se o comando nao bater com nada.
     CommandHandler('start', start),
@@ -133,4 +140,5 @@ HANDLERS = [
     CommandHandler('ver_nutrientes', check_nutrients),
     CommandHandler('add_info_nutriente', add_nutrient_information),
     CommandHandler('estou_com_sorte', im_lucky),
+    CommandHandler('add_receita', add_recipe)
 ]
