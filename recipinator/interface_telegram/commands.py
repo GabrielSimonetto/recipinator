@@ -145,9 +145,6 @@ def add_nutrient_information(_: Bot, update: Update):
     
     update.message.reply_text(f"Nutriente adicionado com sucesso!\n{nutrient}")
 
-def im_lucky(_: Bot, update: Update):
-    update.message.reply_text(str(functionalities.get_recipe_from_id(random.randint(1, 5))))
-
 def add_recipe(_: Bot, update: Update):
     def invalid_input_response():
         update.message.reply_text(
@@ -194,6 +191,5 @@ HANDLERS = [
     CommandHandler('buscar_ingredientes', search_ingredient),
     CommandHandler('ver_nutrientes', check_nutrients),
     CommandHandler('add_info_nutriente', add_nutrient_information),
-    CommandHandler('estou_com_sorte', im_lucky),
     CommandHandler('add_receita', add_recipe)
 ]

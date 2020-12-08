@@ -1,11 +1,12 @@
 import recipinator.database as db
+from recipinator import RECIPE_TABLE_NAME
 
 from recipinator.domain.classes import Recipe, Nutrient
 
 
 def get_recipe(recipe_title):
     recipes = []
-    for row in db.read_query("Select * from recipes"):
+    for row in db.read_query(f"Select * from {RECIPE_TABLE_NAME}"):
         recipes.append(Recipe(row[0],row[1],row[2]))
 
     results = []

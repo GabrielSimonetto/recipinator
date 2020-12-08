@@ -144,8 +144,6 @@ def insert_favorite_recipe(user_id, recipe_id):
     )
     conn.commit()
 
-    c.close()
-    conn.close()
 
 def get_favorites_from_user_id(user_id):
     return read_query(f"""

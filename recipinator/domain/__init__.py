@@ -7,4 +7,6 @@ from recipinator.domain.functionalities import (
     get_favorites,
     get_recipes_with_ingredient,
     search_nutrients_on,
+    add_nutrient,
+    add_new_recipe,
 )
