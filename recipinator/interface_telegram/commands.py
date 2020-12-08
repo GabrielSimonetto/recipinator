@@ -1,4 +1,4 @@
-import json
+import random
 
 from telegram import Bot, Update
 from telegram.ext import CommandHandler
@@ -29,6 +29,7 @@ def _help(_: Bot, update: Update):
                 '/buscar_ingredientes <ingr1> <ingr2>: busca um ou multiplos ingredientes na receita.\n'
                 '/ver_nutrientes <palavra>: retorna os nutrientes de <palavra>.\n'
                 '/add_info_nutriente: adiciona um nutriente customizado.\n'
+                '/add_receita: adiciona uma receita customizado.\n'
     )
 
     update.message.reply_text(message)
@@ -147,16 +148,42 @@ def add_nutrient_information(_: Bot, update: Update):
     update.message.reply_text(f"Nutriente adicionado com sucesso!\n{nutrient}")
 
 def im_lucky(_: Bot, update: Update):
-    import random
-
     update.message.reply_text(str(functionalities.get_recipe_from_id(random.randint(1, 5))))
 
 def add_recipe(_: Bot, update: Update):
+    def invalid_input_response():
+        update.message.reply_text(
+            "Insira o titulo da receita na primeira linha, salte linhas para dividir os ingredientes.\n"
+            "A versão atual ainda não suporta registro de modo de preparo.\n"
+            "Explicações adicionais entre parenteses.\n"
+            "\n"
+            "/add_receita\n"
+            "Yakisoba (Nome da receita)\n"
+            "250g macarrao\n"
+            "100g carne de porco\n"
+            "100g carne de frango\n"
+            "Meia cenoura\n"
+            "Meio repolho\n"
+            "Shoyu\n"
+        )
+    
+    def is_invalid_input(dados):
+        return True if len(dados) < 2 else False
+
     raw = update.message.text[13:]
 
-    receita = raw.split(",")
+    dados = raw.split("\n")
+    # removendo entradas vazias
+    dados = [line for line in dados if line.strip() != ""]
 
-    print(receita)
+    if is_invalid_input(dados):
+        invalid_input_response()
+        return
+
+    user_id = utils._get_user_id(update)
+    recipe = functionalities.add_new_recipe(dados, user_id)
+    
+    update.message.reply_text(f"Receita adicionado com sucesso!\n{recipe}")
 
 
 HANDLERS = [

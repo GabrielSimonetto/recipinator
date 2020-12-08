@@ -95,3 +95,22 @@ def add_nutrient(nutrient_data, user_id):
     nutrient.id = nutrient_id
 
     return nutrient
+
+def add_new_recipe(data, user_id):
+    recipe_name = data[0]
+    ingredients = data[1:]
+
+    # Inputar a recipe no bd
+    recipe_id = db.insert_user_recipe(user_id, recipe_name)
+    
+    # Inputar os ingredientes no banco
+    db.insert_ingredients_table(recipe_id, ingredients)
+
+    recipe = Recipe(recipe_id, recipe_name)
+    return recipe
+
+# TODO: retornar receita inputada por usuario via... join com a ingredients
+#       nao sei como isso triangularia com o resto das coisas, mas no minimo catar a receita pelo id.
+
+    # puta merda eu tenho que devolver a receita com os ingredientes meu deus do ceu
+    # :fear
