@@ -3,7 +3,7 @@ from telegram import Bot, Update
 from recipinator.database import db
 
 from recipinator.interface_telegram.recipinator import Recipe
-
+from recipinator.interface_telegram.nutrients import Nutrient
 
 def get_recipe(update: Update):
     title_recipe = update.message.text[16:]
@@ -77,3 +77,21 @@ def _map_ingredients_to_recipes(ingredient_list):
 
 def search_nutrients_on(something):
     return db.search_nutrition(something)
+
+
+def add_nutrient(nutrient_data, user_id):
+    # Id will be corrected when inputing on BD
+    nutrient = Nutrient(
+        id = 42, 
+        description = nutrient_data[0],
+        energy_kcal = nutrient_data[1],
+        carbohydrate_g = nutrient_data[2],
+        protein_g = nutrient_data[3],
+        lipid_g = nutrient_data[4],
+        fiber_g = nutrient_data[5],
+    )
+
+    nutrient_id = db.insert_user_nutrient(user_id, **nutrient.__dict__)
+    nutrient.id = nutrient_id
+
+    return nutrient
