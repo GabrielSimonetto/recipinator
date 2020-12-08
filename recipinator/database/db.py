@@ -1,5 +1,6 @@
 import sqlite3
 import pandas as pd
+from random import randrange
 
 from recipinator import (
     DB_PATH,
@@ -14,6 +15,16 @@ from recipinator.database.load_nutrient_information import get_nutrient_informat
 
 conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 c = conn.cursor()
+
+
+def create_database():
+    _create_table_recipes()
+    _create_table_ingredients()
+    _create_table_favorites()
+    _create_table_users()
+
+    _default_table_population()
+
 
 # maybe generalize this later
 # maybe always remove before creating seems better?
@@ -50,21 +61,6 @@ def _create_table_users():
             (id INTEGER PRIMARY KEY)
     """)
 
-# I would like to use the COLS definition on load_nutrient_information
-# but i don't know how
-# def _create_table_nutrients():    
-#     c.execute(f"""
-#         CREATE TABLE IF NOT EXISTS {NUTRIENTS_TABLE_NAME}
-#             (id INTEGER PRIMARY KEY
-#             name TEXT, 
-#             calories REAL,
-#             carbohydrate REAL,
-#             protein REAL,
-#             fat REAL,
-#             fiber REAL
-#             )
-#     """)
-
 def _default_table_population():
     print("Populating recipes")
     recipes_data_list = get_scraped_data()
@@ -72,6 +68,7 @@ def _default_table_population():
 
     print("Populating nutrients")
     nutrients_data = get_nutrient_information()
+    nutrients_data['owner_id'] = None
     nutrients_data.to_sql(name=NUTRIENTS_TABLE_NAME,
                             con=conn,
                             if_exists='replace')
@@ -104,23 +101,6 @@ def _insert_data_recipes(data_list):
         )
 
         _insert_ingredients_table(recipe_id, recipe['ingredients'])
-
-
-# def _insert_data_nutrients(nutrients_data):
-#     for recipe in data_list
-#         c.execute(f"""
-#             INSERT INTO 
-#                 {RECIPE_TABLE_NAME}
-#                 (title, link)
-#             VALUES(
-#                 ?, ?
-#             )""",
-#             (recipe['title'], recipe['link'])
-#         )
-#         conn.commit()
-
-#     c.close()
-#     conn.close()
 
 
 def _insert_ingredients_table(recipe_id, ingredients):
@@ -196,12 +176,51 @@ def search_nutrition(ingredient_name):
     return dict_values
 
 
+def insert_user_nutrient(user_id,
+                            description, 
+                            energy_kcal, 
+                            protein_g,
+                            lipid_g,
+                            carbohydrate_g,
+                            fiber_g,
+                            **kwargs):
+
+    from random import randrange
+    nutrient_id = randrange(600, 1000)
+
+    c.execute(f"""
+        INSERT INTO 
+            {NUTRIENTS_TABLE_NAME}
+            (
+                id,
+                description, 
+                energy_kcal, 
+                protein_g, 
+                lipid_g, 
+                carbohydrate_g, 
+                fiber_g,
+                owner_id
+            )
+        VALUES(
+            ?, ?, ?, ?, ?, ?, ?, ?
+        )""",
+        (
+            nutrient_id,
+            description, 
+            energy_kcal, 
+            protein_g, 
+            lipid_g, 
+            carbohydrate_g, 
+            fiber_g,
+            user_id
+        )
+    )
+    conn.commit()
+
+    # c.close()
+    # conn.close()
+
+    return nutrient_id
 
 if __name__ == '__main__':
-    _create_table_recipes()
-    _create_table_ingredients()
-    _create_table_favorites()
-    _create_table_users()
-    # _create_table_nutrients()
-
-    _default_table_population()
+    create_database()
