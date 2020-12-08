@@ -144,8 +144,6 @@ def insert_favorite_recipe(user_id, recipe_id):
     )
     conn.commit()
 
-    c.close()
-    conn.close()
 
 def get_favorites_from_user_id(user_id):
     return read_query(f"""
@@ -220,13 +218,8 @@ def insert_user_nutrient(user_id,
     )
     conn.commit()
 
-    # c.close()
-    # conn.close()
-
     return nutrient_id
 
-# TODO: tamo inserindo owner, tem que começar a pensar em...
-#    se a gente nao quebrou o resto do programa.
 def insert_user_recipe(user_id, recipe_name):
     c.execute(f"""
         INSERT INTO 
@@ -241,15 +234,6 @@ def insert_user_recipe(user_id, recipe_name):
 
     recipe_id = c.lastrowid
     return recipe_id
-
-
-def insert_user_recipe_ingredients(user_id, ingredients):
-    pass
-
-# TODO:
-# Get ingredients from recipe
-# Necessaria pra receitas inputadas por usuário
-# but... first things first.
 
 
 if __name__ == '__main__':

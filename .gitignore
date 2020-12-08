@@ -47,8 +47,6 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Scrapy stuff:
-.scrapy
 
 # pyenv
 .python-version
@@ -62,3 +60,7 @@ ENV/
 env.bak/
 venv.bak/
 
+# Data: crawlers, db's, json's:
+.scrapy
+.json
+.db

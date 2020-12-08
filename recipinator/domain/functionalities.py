@@ -1,21 +1,17 @@
-from telegram import Bot, Update
+import recipinator.database as db
+from recipinator import RECIPE_TABLE_NAME
 
-from recipinator.database import db
+from recipinator.domain.classes import Recipe, Nutrient
 
-from recipinator.interface_telegram.recipinator import Recipe
-from recipinator.interface_telegram.nutrients import Nutrient
 
-def get_recipe(update: Update):
-    title_recipe = update.message.text[16:]
-    print(title_recipe)
-
+def get_recipe(recipe_title):
     recipes = []
-    for row in db.read_query("Select * from recipes"):
+    for row in db.read_query(f"Select * from {RECIPE_TABLE_NAME}"):
         recipes.append(Recipe(row[0],row[1],row[2]))
 
     results = []
     for recipe in recipes:
-        if  title_recipe in recipe.name: 
+        if recipe_title in recipe.name: 
             results.append(recipe)
 
     return results
@@ -27,10 +23,6 @@ def get_recipe_from_id(id):
 
 def set_favorite_recipe(user_id, recipe_id):
     db.insert_favorite_recipe(user_id, recipe_id)
-    # unico jeito de nao dar seria se o recipe_id fosse invalido...
-    # atualmente acho que isso quebra o codigo no banco de dados por causa das foreign keys
-    # talvez seja importante pegar essa exceção aqui
-    # mas ai da pra jogar com raises do db ate aqui, funciona melhor.
     return "Receita favoritada com sucesso"
 
 
@@ -52,7 +44,7 @@ def get_favorites(user_id):
     return favo
 
 # tirar essa merda depois
-def get_recipes_with_ingredient(ingredient_list=['sal', 'ovo']):
+def get_recipes_with_ingredient(ingredient_list):
     from collections import Counter
 
     ingredient_map = _map_ingredients_to_recipes(ingredient_list)

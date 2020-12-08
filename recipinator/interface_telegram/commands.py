@@ -3,10 +3,10 @@ import random
 from telegram import Bot, Update
 from telegram.ext import CommandHandler
 
-from recipinator.domain import functionalities
 from recipinator.interface_telegram import utils
-from recipinator.interface_telegram.recipinator import Recipe
-from recipinator.interface_telegram.nutrients import Nutrient
+from recipinator.domain import functionalities, Recipe, Nutrient
+
+MAX_RETURN_SIZE = 3
 
 
 def start(_: Bot, update: Update):
@@ -36,12 +36,11 @@ def _help(_: Bot, update: Update):
 
 
 def search_recipe(_: Bot, update:Update):
-    results = functionalities.get_recipe(update)
-    
-    for i, result in enumerate(results):
+    recipe_title = update.message.text[16:]
+    results = functionalities.get_recipe(recipe_title)
+
+    for result in results[:MAX_RETURN_SIZE]:
         update.message.reply_text(str(result))
-        if i > 3:
-            break
 
 
 def favorite_recipe(_: Bot, update:Update):
@@ -76,9 +75,8 @@ def search_ingredient(_: Bot, update: Update):
 
     ingredient_map, ingredient_count = functionalities.get_recipes_with_ingredient(ingredients)
 
-    RETURN_SIZE = 3
     if len(ingredients) > 1:
-        for recipe_id, _ in sorted(ingredient_count.items(), key=lambda kv:(kv[1], kv[0]), reverse=True)[:RETURN_SIZE]:
+        for recipe_id, _ in sorted(ingredient_count.items(), key=lambda kv:(kv[1], kv[0]), reverse=True)[:MAX_RETURN_SIZE]:
             update.message.reply_text(f"Nessa receita encontrei: {ingredient_map[recipe_id]}\n\n"
                                         f"{functionalities.get_recipe_from_id(recipe_id)}")
 
@@ -86,7 +84,7 @@ def search_ingredient(_: Bot, update: Update):
     # receitas e vai ficar bem melhor, ai nao tem que acertar como cada iterador funca
     # inclusive ajuda a tratar o caso em que tu nao acha nada.
     elif len(ingredients) == 1:
-        for recipe_id in [i for i in ingredient_count.keys()][:RETURN_SIZE]:
+        for recipe_id in [i for i in ingredient_count.keys()][:MAX_RETURN_SIZE]:
             update.message.reply_text(f"{functionalities.get_recipe_from_id(recipe_id)}")
 
     else:
@@ -147,9 +145,6 @@ def add_nutrient_information(_: Bot, update: Update):
     
     update.message.reply_text(f"Nutriente adicionado com sucesso!\n{nutrient}")
 
-def im_lucky(_: Bot, update: Update):
-    update.message.reply_text(str(functionalities.get_recipe_from_id(random.randint(1, 5))))
-
 def add_recipe(_: Bot, update: Update):
     def invalid_input_response():
         update.message.reply_text(
@@ -196,6 +191,5 @@ HANDLERS = [
     CommandHandler('buscar_ingredientes', search_ingredient),
     CommandHandler('ver_nutrientes', check_nutrients),
     CommandHandler('add_info_nutriente', add_nutrient_information),
-    CommandHandler('estou_com_sorte', im_lucky),
     CommandHandler('add_receita', add_recipe)
 ]
