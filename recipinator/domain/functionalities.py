@@ -43,7 +43,6 @@ def get_favorites(user_id):
 
     return favo
 
-# tirar essa merda depois
 def get_recipes_with_ingredient(ingredient_list):
     from collections import Counter
 
