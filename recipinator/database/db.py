@@ -235,6 +235,10 @@ def insert_user_recipe(user_id, recipe_name):
     recipe_id = c.lastrowid
     return recipe_id
 
+def get_ingredients_from_recipe(recipe_id):
+    return read_query(f"""
+        select ingredient from {INGREDIENTS_TABLE_NAME} where recipe_id={recipe_id}
+    """)
 
 if __name__ == '__main__':
     create_database()

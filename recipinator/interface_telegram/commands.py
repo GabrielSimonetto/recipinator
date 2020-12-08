@@ -6,6 +6,7 @@ from telegram.ext import CommandHandler
 from recipinator.interface_telegram import utils
 from recipinator.domain import functionalities, Recipe, Nutrient
 
+
 MAX_RETURN_SIZE = 3
 
 
@@ -14,8 +15,7 @@ def start(_: Bot, update: Update):
               "Com este incrível bot sua vida e sua alimentação serão melhores!!\n\n"
               "Você pode enviar ingredientes que você gostaria de ter em uma receita" 
               " e iremos buscar a receita que abrange o máximo possível os ingredientes fornecidos.\n\n"
-              "Você poderá também criar cardápios e favoritar as receitas que quiser.\n\n"
-              "Com cardapios você conseguirá ver o valor nutricional das receitas adicionadas nele.\n\n"
+              "Você poderá também favoritar as receitas e procurar sua informação nutricional.\n\n"
               "Chame /help para ver como usar os comandos.")
 
     update.message.reply_text(message)
@@ -35,12 +35,24 @@ def _help(_: Bot, update: Update):
     update.message.reply_text(message)
 
 
+def _add_user_recipe_message(update, recipe):
+    if recipe.link == None:
+        ingredient_list = functionalities.get_ingredients_from_recipe(recipe.recipe_id)
+
+        ingredient_string = ""
+        for ingredient in ingredient_list:
+            ingredient_string = ingredient_string + "\n" + f"{ingredient}"
+
+        update.message.reply_text(f"{recipe.name}" + ingredient_string)
+
+
 def search_recipe(_: Bot, update:Update):
     recipe_title = update.message.text[16:]
     results = functionalities.get_recipe(recipe_title)
 
     for result in results[:MAX_RETURN_SIZE]:
         update.message.reply_text(str(result))
+        _add_user_recipe_message(update, result)
 
 
 def favorite_recipe(_: Bot, update:Update):
@@ -58,7 +70,7 @@ def get_favorites(_: Bot, update:Update):
     for recipe in results:
         print((recipe))
         update.message.reply_text(str(recipe))
-
+        _add_user_recipe_message(update, recipe)
 
 
 def search_ingredient(_: Bot, update: Update):
@@ -77,20 +89,26 @@ def search_ingredient(_: Bot, update: Update):
 
     if len(ingredients) > 1:
         for recipe_id, _ in sorted(ingredient_count.items(), key=lambda kv:(kv[1], kv[0]), reverse=True)[:MAX_RETURN_SIZE]:
-            update.message.reply_text(f"Nessa receita encontrei: {ingredient_map[recipe_id]}\n\n"
-                                        f"{functionalities.get_recipe_from_id(recipe_id)}")
+            recipe = functionalities.get_recipe_from_id(recipe_id)
+
+            update.message.reply_text(f"Nessa receita encontrei: {ingredient_map[recipe_id]}\n\n")
+            update.message.reply_text(f"{recipe}")
+            _add_user_recipe_message(update, recipe)
+
 
     # se a gente tratar isso em outro lugar a gente pode até ja devolver a lista de 
     # receitas e vai ficar bem melhor, ai nao tem que acertar como cada iterador funca
     # inclusive ajuda a tratar o caso em que tu nao acha nada.
     elif len(ingredients) == 1:
         for recipe_id in [i for i in ingredient_count.keys()][:MAX_RETURN_SIZE]:
-            update.message.reply_text(f"{functionalities.get_recipe_from_id(recipe_id)}")
+            recipe = functionalities.get_recipe_from_id(recipe_id)
+            update.message.reply_text(f"{recipe}")
+            _add_user_recipe_message(update, recipe)
 
     else:
         update.message.reply_text(f"Algo deu errado, voce enviou {raw}, parece certo?")
 
-    
+
 def check_nutrients(_: Bot, update: Update):
     raw = update.message.text
     recipe_or_ingredient = raw[16:]
@@ -180,6 +198,10 @@ def add_recipe(_: Bot, update: Update):
     
     update.message.reply_text(f"Receita adicionado com sucesso!\n{recipe}")
 
+def get_ingredients_from_recipe(recipe_id):
+    recipe_list = db.get_ingredients_from_recipe(recipe_id)
+    import ipdb; ipdb.set_trace()
+    return recipe_list
 
 HANDLERS = [
     # TODO retornar uma mensagem de erro se o comando nao bater com nada.
