@@ -92,7 +92,6 @@ def _insert_data_recipes(data_list):
         conn.commit()
 
     for recipe in data_list:
-        # import ipdb; ipdb.set_trace()
         _insert_query(recipe)
 
         recipe_id = c.lastrowid
@@ -125,7 +124,6 @@ def read_query(query):
     return result
 
 def get_recipe(id):
-    # TODO: Tratamento para receita com id de usuário.
     return read_query(
         f"""
         Select * from {RECIPE_TABLE_NAME} where id={id}
@@ -235,6 +233,10 @@ def insert_user_recipe(user_id, recipe_name):
     recipe_id = c.lastrowid
     return recipe_id
 
+def get_ingredients_from_recipe(recipe_id):
+    return read_query(f"""
+        select ingredient from {INGREDIENTS_TABLE_NAME} where recipe_id={recipe_id}
+    """)
 
 if __name__ == '__main__':
     create_database()

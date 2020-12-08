@@ -43,7 +43,6 @@ def get_favorites(user_id):
 
     return favo
 
-# tirar essa merda depois
 def get_recipes_with_ingredient(ingredient_list):
     from collections import Counter
 
@@ -88,6 +87,7 @@ def add_nutrient(nutrient_data, user_id):
 
     return nutrient
 
+
 def add_new_recipe(data, user_id):
     recipe_name = data[0]
     ingredients = data[1:]
@@ -101,8 +101,9 @@ def add_new_recipe(data, user_id):
     recipe = Recipe(recipe_id, recipe_name)
     return recipe
 
-# TODO: retornar receita inputada por usuario via... join com a ingredients
-#       nao sei como isso triangularia com o resto das coisas, mas no minimo catar a receita pelo id.
+def get_ingredients_from_recipe(recipe_id):
+    # ingredients = [('morango',), ('maçã',), ('laranja',), ('banana',), ('açucar',)]
+    ingredients =  db.get_ingredients_from_recipe(recipe_id)
+    ingredients = [i[0] for i in ingredients]
+    return ingredients
 
-    # puta merda eu tenho que devolver a receita com os ingredientes meu deus do ceu
-    # :fear

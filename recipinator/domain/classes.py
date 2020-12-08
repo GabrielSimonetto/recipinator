@@ -25,17 +25,17 @@ class Recipe:
     link: str = None
     owner: int = None
 
-    def __str__(self):
+    def _represent_recipe(self):
         if self.link != None:
             return f"Receita de ID:{self.recipe_id}; {self.name}: {self.link}"
         else:
             return f"Receita de ID:{self.recipe_id}; {self.name}: adicionado por usuário."
 
+    def __str__(self):
+        return self._represent_recipe()
+
     def __repr__(self):
-        if self.link != None:
-            return f"Receita de ID:{self.recipe_id}; {self.name}: {self.link}"
-        else:
-            return f"Receita de ID:{self.recipe_id}; {self.name}: adicionado por usuário."
+        return self._represent_recipe()
 
     def get_recipe_id(self):
         return self.recipe_id
