@@ -1,6 +1,6 @@
 import recipinator.database as db
 
-from recipinator.domain.classes import Recipe
+from recipinator.domain.classes import Recipe, Nutrient
 
 
 def get_recipe(recipe_title):
@@ -22,10 +22,6 @@ def get_recipe_from_id(id):
 
 def set_favorite_recipe(user_id, recipe_id):
     db.insert_favorite_recipe(user_id, recipe_id)
-    # unico jeito de nao dar seria se o recipe_id fosse invalido...
-    # atualmente acho que isso quebra o codigo no banco de dados por causa das foreign keys
-    # talvez seja importante pegar essa exceção aqui
-    # mas ai da pra jogar com raises do db ate aqui, funciona melhor.
     return "Receita favoritada com sucesso"
 
 
@@ -70,5 +66,42 @@ def _map_ingredients_to_recipes(ingredient_list):
     return results
 
 
-def search_nutrients_on(recipe_or_ingredient):
-    return db.search_nutrition(recipe_or_ingredient)
+def search_nutrients_on(something):
+    return db.search_nutrition(something)
+
+
+def add_nutrient(nutrient_data, user_id):
+    # Id will be corrected when inputing on BD
+    nutrient = Nutrient(
+        id = 42, 
+        description = nutrient_data[0],
+        energy_kcal = nutrient_data[1],
+        carbohydrate_g = nutrient_data[2],
+        protein_g = nutrient_data[3],
+        lipid_g = nutrient_data[4],
+        fiber_g = nutrient_data[5],
+    )
+
+    nutrient_id = db.insert_user_nutrient(user_id, **nutrient.__dict__)
+    nutrient.id = nutrient_id
+
+    return nutrient
+
+def add_new_recipe(data, user_id):
+    recipe_name = data[0]
+    ingredients = data[1:]
+
+    # Inputar a recipe no bd
+    recipe_id = db.insert_user_recipe(user_id, recipe_name)
+    
+    # Inputar os ingredientes no banco
+    db.insert_ingredients_table(recipe_id, ingredients)
+
+    recipe = Recipe(recipe_id, recipe_name)
+    return recipe
+
+# TODO: retornar receita inputada por usuario via... join com a ingredients
+#       nao sei como isso triangularia com o resto das coisas, mas no minimo catar a receita pelo id.
+
+    # puta merda eu tenho que devolver a receita com os ingredientes meu deus do ceu
+    # :fear

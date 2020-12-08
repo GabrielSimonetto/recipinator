@@ -1,3 +1,5 @@
+import random
+
 from telegram import Bot, Update
 from telegram.ext import CommandHandler
 
@@ -25,7 +27,10 @@ def _help(_: Bot, update: Update):
                 '/favoritar <id>: favorita a receita do respectivo id.\n'
                 '/meus_favoritos: retorna suas receitas favoritas.\n'
                 '/buscar_ingredientes <ingr1> <ingr2>: busca um ou multiplos ingredientes na receita.\n'
-                '/ver_nutrientes <palavra>: retorna os nutrientes de <palavra>.\n')
+                '/ver_nutrientes <palavra>: retorna os nutrientes de <palavra>.\n'
+                '/add_info_nutriente: adiciona um nutriente customizado.\n'
+                '/add_receita: adiciona uma receita customizado.\n'
+    )
 
     update.message.reply_text(message)
 
@@ -101,6 +106,83 @@ def check_nutrients(_: Bot, update: Update):
         nutrient = Nutrient(**food)
         update.message.reply_text(str(nutrient))
 
+def add_nutrient_information(_: Bot, update: Update):
+    def invalid_input_response():
+        update.message.reply_text(
+            "Insira as informações de nutrição segundo o exemplo: (explicações entre parenteses)\n"
+            "\n"
+            "/add_info_nutriente\n"
+            "Amendoas (Nome do ingrediente)\n"
+            "151 --- (kcal a cada 100g de ingrediente)\n"
+            "15 ---- (gramas de carboidrato a cada 100g de ingrediente)\n"
+            "4 ------ (gramas de proteína a cada 100g de ingrediente)\n"
+            "15 ---- (gramas de gordura a cada 100g de ingrediente)\n"
+            "4 ------ (gramas de fibra a cada 100g de ingrediente)\n"
+        )
+
+    def is_invalid_input(dados):
+        if len(dados) != 6:
+            return True
+
+        # Valores após o nome devem ser inteiros.
+        try:
+            list(map(float, dados[1:]))
+            return False
+        except ValueError:
+            return True
+
+    raw = update.message.text[20:]
+    dados = raw.split("\n")
+    # removendo entradas vazias
+    dados = [line for line in dados if line.strip() != ""]
+
+    if is_invalid_input(dados):
+        invalid_input_response()
+        return
+
+    user_id = utils._get_user_id(update)
+    nutrient = functionalities.add_nutrient(dados, user_id)
+    
+    update.message.reply_text(f"Nutriente adicionado com sucesso!\n{nutrient}")
+
+def im_lucky(_: Bot, update: Update):
+    update.message.reply_text(str(functionalities.get_recipe_from_id(random.randint(1, 5))))
+
+def add_recipe(_: Bot, update: Update):
+    def invalid_input_response():
+        update.message.reply_text(
+            "Insira o titulo da receita na primeira linha, salte linhas para dividir os ingredientes.\n"
+            "A versão atual ainda não suporta registro de modo de preparo.\n"
+            "Explicações adicionais entre parenteses.\n"
+            "\n"
+            "/add_receita\n"
+            "Yakisoba (Nome da receita)\n"
+            "250g macarrao\n"
+            "100g carne de porco\n"
+            "100g carne de frango\n"
+            "Meia cenoura\n"
+            "Meio repolho\n"
+            "Shoyu\n"
+        )
+    
+    def is_invalid_input(dados):
+        return True if len(dados) < 2 else False
+
+    raw = update.message.text[13:]
+
+    dados = raw.split("\n")
+    # removendo entradas vazias
+    dados = [line for line in dados if line.strip() != ""]
+
+    if is_invalid_input(dados):
+        invalid_input_response()
+        return
+
+    user_id = utils._get_user_id(update)
+    recipe = functionalities.add_new_recipe(dados, user_id)
+    
+    update.message.reply_text(f"Receita adicionado com sucesso!\n{recipe}")
+
 
 HANDLERS = [
     # TODO retornar uma mensagem de erro se o comando nao bater com nada.
@@ -111,4 +193,7 @@ HANDLERS = [
     CommandHandler('meus_favoritos', get_favorites),
     CommandHandler('buscar_ingredientes', search_ingredient),
     CommandHandler('ver_nutrientes', check_nutrients),
+    CommandHandler('add_info_nutriente', add_nutrient_information),
+    CommandHandler('estou_com_sorte', im_lucky),
+    CommandHandler('add_receita', add_recipe)
 ]

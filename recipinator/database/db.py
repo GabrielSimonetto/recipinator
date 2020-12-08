@@ -1,5 +1,6 @@
 import sqlite3
 import pandas as pd
+from random import randrange
 
 from recipinator import (
     DB_PATH,
@@ -32,7 +33,8 @@ def _create_table_recipes():
         CREATE TABLE IF NOT EXISTS {RECIPE_TABLE_NAME}
             (id INTEGER PRIMARY KEY,
             title TEXT,
-            link TEXT)
+            link TEXT,
+            owner INTEGER)
     """)
 
 def _create_table_ingredients():
@@ -60,21 +62,6 @@ def _create_table_users():
             (id INTEGER PRIMARY KEY)
     """)
 
-# I would like to use the COLS definition on load_nutrient_information
-# but i don't know how
-# def _create_table_nutrients():    
-#     c.execute(f"""
-#         CREATE TABLE IF NOT EXISTS {NUTRIENTS_TABLE_NAME}
-#             (id INTEGER PRIMARY KEY
-#             name TEXT, 
-#             calories REAL,
-#             carbohydrate REAL,
-#             protein REAL,
-#             fat REAL,
-#             fiber REAL
-#             )
-#     """)
-
 def _default_table_population():
     print("Populating recipes")
     recipes_data_list = get_scraped_data()
@@ -82,6 +69,7 @@ def _default_table_population():
 
     print("Populating nutrients")
     nutrients_data = get_nutrient_information()
+    nutrients_data['owner_id'] = None
     nutrients_data.to_sql(name=NUTRIENTS_TABLE_NAME,
                             con=conn,
                             if_exists='replace')
@@ -95,15 +83,16 @@ def _insert_data_recipes(data_list):
         c.execute(f"""
             INSERT INTO 
                 {RECIPE_TABLE_NAME}
-                (title, link)
+                (title, link, owner)
             VALUES(
-                ?, ?
+                ?, ?, ?
             )""",
-            (recipe['title'], recipe['link'])
+            (recipe['title'], recipe['link'], None)
         )
         conn.commit()
 
     for recipe in data_list:
+        # import ipdb; ipdb.set_trace()
         _insert_query(recipe)
 
         recipe_id = c.lastrowid
@@ -113,27 +102,10 @@ def _insert_data_recipes(data_list):
             f"Title: {recipe['title']}\n"
         )
 
-        _insert_ingredients_table(recipe_id, recipe['ingredients'])
+        insert_ingredients_table(recipe_id, recipe['ingredients'])
 
 
-# def _insert_data_nutrients(nutrients_data):
-#     for recipe in data_list
-#         c.execute(f"""
-#             INSERT INTO 
-#                 {RECIPE_TABLE_NAME}
-#                 (title, link)
-#             VALUES(
-#                 ?, ?
-#             )""",
-#             (recipe['title'], recipe['link'])
-#         )
-#         conn.commit()
-
-#     c.close()
-#     conn.close()
-
-
-def _insert_ingredients_table(recipe_id, ingredients):
+def insert_ingredients_table(recipe_id, ingredients):
     for ingredient in ingredients:
         c.execute(f"""
             INSERT INTO
@@ -153,6 +125,7 @@ def read_query(query):
     return result
 
 def get_recipe(id):
+    # TODO: Tratamento para receita com id de usuário.
     return read_query(
         f"""
         Select * from {RECIPE_TABLE_NAME} where id={id}
@@ -205,6 +178,64 @@ def search_nutrition(ingredient_name):
     dict_values = df[mask_values_with_ingredient].T.to_dict().values()
     return dict_values
 
+
+def insert_user_nutrient(user_id,
+                            description, 
+                            energy_kcal, 
+                            protein_g,
+                            lipid_g,
+                            carbohydrate_g,
+                            fiber_g,
+                            **kwargs):
+
+    from random import randrange
+    nutrient_id = randrange(600, 1000)
+
+    c.execute(f"""
+        INSERT INTO 
+            {NUTRIENTS_TABLE_NAME}
+            (
+                id,
+                description, 
+                energy_kcal, 
+                protein_g, 
+                lipid_g, 
+                carbohydrate_g, 
+                fiber_g,
+                owner_id
+            )
+        VALUES(
+            ?, ?, ?, ?, ?, ?, ?, ?
+        )""",
+        (
+            nutrient_id,
+            description, 
+            energy_kcal, 
+            protein_g, 
+            lipid_g, 
+            carbohydrate_g, 
+            fiber_g,
+            user_id
+        )
+    )
+    conn.commit()
+
+    return nutrient_id
+
+def insert_user_recipe(user_id, recipe_name):
+    c.execute(f"""
+        INSERT INTO 
+            {RECIPE_TABLE_NAME}
+            (title, link, owner)
+        VALUES(
+            ?, ?, ?
+        )""",
+        (recipe_name, None, user_id)
+    )
+    conn.commit()
+
+    recipe_id = c.lastrowid
+    return recipe_id
 
 
 if __name__ == '__main__':
