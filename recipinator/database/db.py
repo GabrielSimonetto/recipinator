@@ -33,7 +33,8 @@ def _create_table_recipes():
         CREATE TABLE IF NOT EXISTS {RECIPE_TABLE_NAME}
             (id INTEGER PRIMARY KEY,
             title TEXT,
-            link TEXT)
+            link TEXT,
+            owner INTEGER)
     """)
 
 def _create_table_ingredients():
@@ -82,15 +83,16 @@ def _insert_data_recipes(data_list):
         c.execute(f"""
             INSERT INTO 
                 {RECIPE_TABLE_NAME}
-                (title, link)
+                (title, link, owner)
             VALUES(
-                ?, ?
+                ?, ?, ?
             )""",
-            (recipe['title'], recipe['link'])
+            (recipe['title'], recipe['link'], None)
         )
         conn.commit()
 
     for recipe in data_list:
+        # import ipdb; ipdb.set_trace()
         _insert_query(recipe)
 
         recipe_id = c.lastrowid
@@ -100,10 +102,10 @@ def _insert_data_recipes(data_list):
             f"Title: {recipe['title']}\n"
         )
 
-        _insert_ingredients_table(recipe_id, recipe['ingredients'])
+        insert_ingredients_table(recipe_id, recipe['ingredients'])
 
 
-def _insert_ingredients_table(recipe_id, ingredients):
+def insert_ingredients_table(recipe_id, ingredients):
     for ingredient in ingredients:
         c.execute(f"""
             INSERT INTO
@@ -123,6 +125,7 @@ def read_query(query):
     return result
 
 def get_recipe(id):
+    # TODO: Tratamento para receita com id de usuário.
     return read_query(
         f"""
         Select * from {RECIPE_TABLE_NAME} where id={id}
@@ -221,6 +224,33 @@ def insert_user_nutrient(user_id,
     # conn.close()
 
     return nutrient_id
+
+# TODO: tamo inserindo owner, tem que começar a pensar em...
+#    se a gente nao quebrou o resto do programa.
+def insert_user_recipe(user_id, recipe_name):
+    c.execute(f"""
+        INSERT INTO 
+            {RECIPE_TABLE_NAME}
+            (title, link, owner)
+        VALUES(
+            ?, ?, ?
+        )""",
+        (recipe_name, None, user_id)
+    )
+    conn.commit()
+
+    recipe_id = c.lastrowid
+    return recipe_id
+
+
+def insert_user_recipe_ingredients(user_id, ingredients):
+    pass
+
+# TODO:
+# Get ingredients from recipe
+# Necessaria pra receitas inputadas por usuário
+# but... first things first.
+
 
 if __name__ == '__main__':
     create_database()
